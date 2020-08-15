@@ -43,6 +43,10 @@ function imageFilesPaths = enumerate_image_files(relative_folder_path)
         filePattern = sprintf('%s/*.jpg', thisFolder);
         baseFileNames = [baseFileNames; dir(filePattern)];
 
+        % Add on JPEG files.
+        filePattern = sprintf('%s/*.jpeg', thisFolder);
+        baseFileNames = [baseFileNames; dir(filePattern)];
+        
         % Add on GIF files.
         filePattern = sprintf('%s/*.gif', thisFolder);
         baseFileNames = [baseFileNames; dir(filePattern)];
