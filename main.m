@@ -7,9 +7,10 @@ image_files_paths = enumerate_image_files('./images');
 
 current_curve_index = 0;
 h = figure;
-curves_folder = sprintf("./curves_%s", date);
+datetime_str = datestr(now,'mmmm_dd_yyyy_HH_MM_SS');
+curves_folder = sprintf("./curves_%s", datetime_str);
 mkdir(curves_folder);
-save(sprintf('%s/curves_%s.mat', curves_folder, date), 'curves');
+save(sprintf('%s/curves_%s.mat', curves_folder, datetime_str), 'curves');
 for i=1:images_count
     try
         Z = imread(image_files_paths(i).path);
@@ -24,7 +25,7 @@ for i=1:images_count
     if(channels > 1)
         Z = rgb2gray(Z);
     end
-    Z = imgaussfilt(Z, 32);
+    Z = imgaussfilt(Z, 16);
     
     [rows, cols, ~] = size(Z);
     [X,Y] = ndgrid(1:rows,1:cols);
@@ -53,4 +54,4 @@ for i=1:images_count
     fprintf("%d extracted at iteration %d; curves count = %d\n", current_curves_count, i, curves_count);
 end
 
-save(sprintf('%s/curves_%s.mat', curves_folder, date), 'curves');
+save(sprintf('%s/curves_%s.mat', curves_folder, datetime_str), 'curves');
