@@ -40,8 +40,8 @@ function [curves] = get_closed_curves(M, min_points, max_points, max_extracted_c
     
     [contours_count, ~] = size(contours_sorted);
     for i=1:contours_count
-        % if(contours_sorted(i).numel >= min_points && contours_sorted(i).numel <= max_points && i <= max_extracted_curves)
-        if(contours_sorted(i).numel >= min_points)
+        if(contours_sorted(i).numel >= min_points && contours_sorted(i).numel <= max_points && i <= max_extracted_curves)
+%         if(contours_sorted(i).numel >= min_points)
             curves = [curves; contours_sorted(i)];
         end
     end
