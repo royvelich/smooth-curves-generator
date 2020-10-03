@@ -2,15 +2,13 @@ addpath(genpath('./helpers/'));
 addpath(genpath('./helpers/curvature/'));
 addpath(genpath('./helpers/linecurvature_version1b/'));
 
-curves = [];
-
 image_files_paths = enumerate_image_files('./images');
 [images_count, ~] = size(image_files_paths);
 
 current_curve_index = 1;
 h = figure;
 datetime_str = datestr(now,'mmmm_dd_yyyy_HH_MM_SS');
-curves_folder = sprintf("./curve_vs_curvature_%s", datetime_str);
+curves_folder = sprintf("./curves_%s", datetime_str);
 mkdir(curves_folder);
 
 contour_levels = 10;
@@ -19,13 +17,16 @@ min_points_count = 1500;
 max_points_count = 3800;
 max_extracted_curves = 1;
 min_variance = 0.001;
-min_mean = 0.008;
+min_mean = 0.01;
 frame_length = 99;
 order = 2;
 smooth_iterations = 6;
 
 for sigma_index=1:length(sigmas)
+    curves = [];
     sigma = sigmas(sigma_index);
+    sigma_curves_folder = sprintf("%s/%d", curves_folder, sigma);
+    mkdir(sigma_curves_folder);
     for i=1:images_count
         try
             Z = imread(image_files_paths(i).path);
@@ -90,7 +91,7 @@ for sigma_index=1:length(sigmas)
             indices = transpose((1:length(kappa)));
             plot(indices, kappa);
 
-            saveas(h, sprintf('%s/curve_%d.png', curves_folder, current_curve_index));
+            saveas(h, sprintf('%s/curve_%d.png', sigma_curves_folder, current_curve_index));
 
             smoothed_curve = struct('numel', length(x_smoothed), 'xdata', x_smoothed, 'ydata', y_smoothed);
 
@@ -103,6 +104,6 @@ for sigma_index=1:length(sigmas)
         [curves_count, ~] = size(curves);
         fprintf("%d extracted at iteration %d; curves count = %d\n", extracted_curves_count, i, curves_count);
     end
+    save(sprintf('%s/curves.mat', sigma_curves_folder), 'curves', 'contour_levels', 'sigma', 'min_points_count', 'max_points_count', 'min_variance', 'min_mean', 'images_count', 'frame_length', 'order', 'smooth_iterations');
 end
 
-save(sprintf('%s/curves_%s.mat', curves_folder, datetime_str), 'curves', 'contour_levels', 'sigmas', 'min_points_count', 'max_points_count', 'min_variance', 'min_mean', 'images_count', 'frame_length', 'order', 'smooth_iterations');
