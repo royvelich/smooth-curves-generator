@@ -2,28 +2,28 @@ addpath(genpath('./helpers/'));
 addpath(genpath('./helpers/curvature/'));
 addpath(genpath('./helpers/linecurvature_version1b/'));
 
-image_files_paths = enumerate_image_files('./images');
+image_files_paths = enumerate_image_files('./images2');
 [images_count, ~] = size(image_files_paths);
 
-current_curve_index = 1;
 h = figure;
 datetime_str = datestr(now,'mmmm_dd_yyyy_HH_MM_SS');
 curves_folder = sprintf("./curves_%s", datetime_str);
 mkdir(curves_folder);
 
-contour_levels = 10;
+contour_levels = 15;
 sigmas = [2,4,8,16,24,32,64];
 min_points_count = 1500;
-max_points_count = 3800;
+max_points_count = 4800;
 max_extracted_curves = 1;
-min_variance = 0.001;
-min_mean = 0.01;
+min_variance = 0.0005;
+min_mean = 0;
 frame_length = 99;
 order = 2;
 smooth_iterations = 6;
 
 for sigma_index=1:length(sigmas)
     curves = [];
+    current_curve_index = 1;
     sigma = sigmas(sigma_index);
     sigma_curves_folder = sprintf("%s/%d", curves_folder, sigma);
     mkdir(sigma_curves_folder);
