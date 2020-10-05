@@ -11,7 +11,7 @@ curves_folder = sprintf("./curves_%s", datetime_str);
 mkdir(curves_folder);
 
 contour_levels = 15;
-sigmas = [2,4,8,16,24,32,64];
+sigmas = [2,4,8,16,32,64];
 min_points_count = 1500;
 max_points_count = 4800;
 max_extracted_curves = 1;
