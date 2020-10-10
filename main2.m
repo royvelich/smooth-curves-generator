@@ -2,7 +2,7 @@ addpath(genpath('./helpers/'));
 addpath(genpath('./helpers/curvature/'));
 addpath(genpath('./helpers/linecurvature_version1b/'));
 
-image_files_paths = enumerate_image_files('./images2');
+image_files_paths = enumerate_image_files('./images');
 [images_count, ~] = size(image_files_paths);
 
 h = figure;
@@ -10,16 +10,24 @@ datetime_str = datestr(now,'mmmm_dd_yyyy_HH_MM_SS');
 curves_folder = sprintf("./curves_%s", datetime_str);
 mkdir(curves_folder);
 
-contour_levels = 15;
-sigmas = [2,4,8,16,32,64];
+contour_levels = 2;
+sigmas = [32];
 min_points_count = 1500;
-max_points_count = 4800;
+max_points_count = 4000;
 max_extracted_curves = 1;
-min_variance = 0.0005;
-min_mean = 0;
-frame_length = 99;
-order = 2;
-smooth_iterations = 6;
+min_variance = 0.0001;
+min_mean = 0.001;
+
+% Smoothing
+smoothing_frame_length = 99;
+smoothing_order = 2;
+smoothing_iterations = 6;
+
+% Curvature flow
+evolution_iterations = 6;
+evolution_scale = 60;
+
+max_abs_curvature = 3;
 
 for sigma_index=1:length(sigmas)
     curves = [];
@@ -60,21 +68,17 @@ for sigma_index=1:length(sigmas)
 
         extracted_curves_count = 0;
         for j=1:current_curves_count 
-            curve = current_curves(j);
-
-            x = pad_array(curve.xdata, 3*frame_length, 'vertical');
-            y = pad_array(curve.ydata, 3*frame_length, 'vertical');
-
-            x_smoothed = smooth_array(x, frame_length, order, smooth_iterations);
-            y_smoothed = smooth_array(y, frame_length, order, smooth_iterations);
-            kappa = calculate_curvature(x_smoothed, y_smoothed);
-
-            x_smoothed  = unpad_array(x_smoothed, 3*frame_length - 1);
-            y_smoothed  = unpad_array(y_smoothed, 3*frame_length - 1);
-            kappa  = unpad_array(kappa, 3*frame_length - 1);    
-
+            curve_object = current_curves(j);
+            curve = horzcat(curve_object.xdata, curve_object.ydata);
+            smoothed_curve = smooth_curve(curve, smoothing_frame_length, smoothing_order, smoothing_iterations);
+            arc_length = calculate_arc_length(smoothed_curve);
+            kappa = calculate_curvature(smoothed_curve, smoothing_frame_length);
+            evolved_curve = evolve_curve(smoothed_curve, evolution_iterations, evolution_scale, smoothing_frame_length, smoothing_order, smoothing_iterations);
+            
             kappa_var = var(kappa);
             kappa_mean = mean(kappa);
+            kappa_min = min(kappa);
+            kappa_max = max(kappa);
 
             if(abs(kappa_mean) < min_mean)
                 continue;
@@ -84,26 +88,37 @@ for sigma_index=1:length(sigmas)
                 continue;
             end
 
-            subplot(2,1,1);
-            plot(x_smoothed, y_smoothed);
-
-            subplot(2,1,2);
+            if(abs(kappa_min) > max_abs_curvature)
+                continue;
+            end
+            
+            if(abs(kappa_max) > max_abs_curvature)
+                continue;
+            end
+            
+            subplot(3,1,1);
+            plot(smoothed_curve(:,1), smoothed_curve(:,2));
+            
+            subplot(3,1,2);
             indices = transpose((1:length(kappa)));
             plot(indices, kappa);
+            
+            subplot(3,1,3);
+            plot(evolved_curve(:,1), evolved_curve(:,2));
 
             saveas(h, sprintf('%s/curve_%d.png', sigma_curves_folder, current_curve_index));
 
-            smoothed_curve = struct('numel', length(x_smoothed), 'xdata', x_smoothed, 'ydata', y_smoothed);
+            smoothed_curve_struct = struct('curve', smoothed_curve, 'arc_length', arc_length, 'kappa', kappa, 'evolved_curve', evolved_curve);
 
             current_curve_index = current_curve_index + 1;
             extracted_curves_count = extracted_curves_count + 1;
-            extracted_curves = [extracted_curves; smoothed_curve];
+            extracted_curves = [extracted_curves; smoothed_curve_struct];
         end
 
         curves = [curves; extracted_curves];    
         [curves_count, ~] = size(curves);
         fprintf("%d extracted at iteration %d; curves count = %d\n", extracted_curves_count, i, curves_count);
     end
-    save(sprintf('%s/curves.mat', sigma_curves_folder), 'curves', 'contour_levels', 'sigma', 'min_points_count', 'max_points_count', 'min_variance', 'min_mean', 'images_count', 'frame_length', 'order', 'smooth_iterations');
+    save(sprintf('%s/curves.mat', sigma_curves_folder), 'curves', 'contour_levels', 'sigma', 'min_points_count', 'max_points_count', 'min_variance', 'min_mean', 'images_count', 'frame_length', 'order', 'smooth_iterations', 'max_abs_curvature');
 end
 

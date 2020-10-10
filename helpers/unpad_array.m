@@ -1,4 +1,4 @@
-function y = unpad_array(x, framelen)
-    y = x((framelen + 1):length(x) - framelen);
+function y = unpad_array(x, padding)
+    y = x((padding + 1):length(x) - padding);
 end
 

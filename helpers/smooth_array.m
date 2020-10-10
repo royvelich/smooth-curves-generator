@@ -4,4 +4,3 @@ function y = smooth_array(x, framelen, order, iterations)
     end 
     y = x;
 end
-
