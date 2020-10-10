@@ -1,7 +1,6 @@
-function evolved_curve = evolve_curve(curve, evolution_iterations, evolution_scale, smoothing_frame_length, smoothing_order, smoothing_iterations)
+function evolved_curve = evolve_curve(curve, evolution_iterations, evolution_dt, smoothing_frame_length, smoothing_order, smoothing_iterations)
 %     h = figure;
     padding = 3;
-	dt = 1;
     evolved_curve = curve;
     for i=1:evolution_iterations
         
@@ -32,8 +31,8 @@ function evolved_curve = evolve_curve(curve, evolution_iterations, evolution_sca
 
 %         quiver(evolved_curve(:,1), evolved_curve(:,2), normal_big(:,1), normal_big(:,2), 0);
         
-        delta = evolution_scale * kappa .* normal;
-        evolved_curve = evolved_curve + dt * delta;
+        delta = kappa .* normal;
+        evolved_curve = evolved_curve + evolution_dt * delta;
         evolved_curve = smooth_curve(evolved_curve, smoothing_frame_length, smoothing_order, smoothing_iterations);
         
 %         hold off

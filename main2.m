@@ -25,7 +25,7 @@ smoothing_iterations = 6;
 
 % Curvature flow
 evolution_iterations = 6;
-evolution_scale = 60;
+evolution_dt = 1e-1;
 
 max_abs_curvature = 3;
 
@@ -73,7 +73,7 @@ for sigma_index=1:length(sigmas)
             smoothed_curve = smooth_curve(curve, smoothing_frame_length, smoothing_order, smoothing_iterations);
             arc_length = calculate_arc_length(smoothed_curve);
             kappa = calculate_curvature(smoothed_curve, smoothing_frame_length);
-            evolved_curve = evolve_curve(smoothed_curve, evolution_iterations, evolution_scale, smoothing_frame_length, smoothing_order, smoothing_iterations);
+            evolved_curve = evolve_curve(smoothed_curve, evolution_iterations, log2(sigma) * evolution_dt, smoothing_frame_length, smoothing_order, smoothing_iterations);
             
             kappa_var = var(kappa);
             kappa_mean = mean(kappa);
