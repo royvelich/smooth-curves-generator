@@ -1,6 +1,6 @@
 function evolved_curve = evolve_curve(curve, evolution_iterations, evolution_dt, smoothing_frame_length, smoothing_order, smoothing_iterations)
 %     h = figure;
-    padding = 3;
+    padding = 2;
     evolved_curve = curve;
     for i=1:evolution_iterations
         

@@ -10,13 +10,13 @@ datetime_str = datestr(now,'mmmm_dd_yyyy_HH_MM_SS');
 curves_folder = sprintf("./curves_%s", datetime_str);
 mkdir(curves_folder);
 
-contour_levels = 2;
-sigmas = [32];
-min_points_count = 1500;
-max_points_count = 4000;
+contour_levels = 1;
+sigmas = [2,4,8,16];
+min_points_count = 1000;
+max_points_count = 7000;
 max_extracted_curves = 1;
-min_variance = 0.0001;
-min_mean = 0.001;
+min_variance = 0.003;
+min_mean = 0.008;
 
 % Smoothing
 smoothing_frame_length = 99;
@@ -27,7 +27,7 @@ smoothing_iterations = 6;
 evolution_iterations = 6;
 evolution_dt = 1e-1;
 
-max_abs_curvature = 3;
+max_abs_curvature = 5;
 
 for sigma_index=1:length(sigmas)
     curves = [];
@@ -119,6 +119,6 @@ for sigma_index=1:length(sigmas)
         [curves_count, ~] = size(curves);
         fprintf("%d extracted at iteration %d; curves count = %d\n", extracted_curves_count, i, curves_count);
     end
-    save(sprintf('%s/curves.mat', sigma_curves_folder), 'curves', 'contour_levels', 'sigma', 'min_points_count', 'max_points_count', 'min_variance', 'min_mean', 'images_count', 'frame_length', 'order', 'smooth_iterations', 'max_abs_curvature');
+    save(sprintf('%s/curves.mat', sigma_curves_folder), 'curves', 'contour_levels', 'sigma', 'min_points_count', 'max_points_count', 'min_variance', 'min_mean', 'images_count', 'smoothing_frame_length', 'smoothing_order', 'smoothing_iterations', 'max_abs_curvature');
 end
 
