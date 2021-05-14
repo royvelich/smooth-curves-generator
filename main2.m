@@ -2,7 +2,7 @@ addpath(genpath('./helpers/'));
 addpath(genpath('./helpers/curvature/'));
 addpath(genpath('./helpers/linecurvature_version1b/'));
 
-image_files_paths = enumerate_image_files('./images');
+image_files_paths = enumerate_image_files('./images_splitted/3');
 [images_count, ~] = size(image_files_paths);
 
 h = figure;
@@ -11,9 +11,9 @@ curves_folder = sprintf("./curves_%s", datetime_str);
 mkdir(curves_folder);
 
 contour_levels = 1;
-sigmas = [2,4,8,16];
+sigmas = [4];
 min_points_count = 1000;
-max_points_count = 7000;
+max_points_count = 4000;
 max_extracted_curves = 1;
 min_variance = 0.003;
 min_mean = 0.008;
@@ -27,7 +27,7 @@ smoothing_iterations = 6;
 evolution_iterations = 6;
 evolution_dt = 1e-1;
 
-max_abs_curvature = 5;
+max_abs_curvature = 6;
 
 for sigma_index=1:length(sigmas)
     curves = [];
